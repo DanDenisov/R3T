@@ -17,9 +17,7 @@ namespace RoboDraw
         public static List<Point> Path;
         public static List<Point[]> Joints;
         public static Tree Tree;
-        public static List<Point> AttrPoints;
-        public static List<double> AttrWeights;
-        public static List<Tuple<Point[], double>> Areas;
+        public static List<Attractor> Attractors;
 
         public static Dictionary<string, bool> States;
 
@@ -80,13 +78,11 @@ namespace RoboDraw
 
             IKP Solver = new IKP(0.02, Manip.Links.Length, 10, 0.2, 50);
 
-            AttrPoints = new List<Point>();
-            AttrWeights = new List<double>();
-            Areas = new List<Tuple<Point[], double>>();
+            Attractors = new List<Attractor>();
 
             Random rng = new Random();
             double work_radius, x, y_plus, y_minus, y;
-            while (AttrPoints.Count < 50)
+            while (Attractors.Count < 200)
             {
                 work_radius = Manip.Links.Sum();
                 x = Manip.Base.x + rng.NextDouble() * 2 * work_radius - work_radius;
@@ -108,10 +104,8 @@ namespace RoboDraw
                 if (!collision)
                 {
                     Point AttrPoint = p;
-                    AttrPoints.Add(AttrPoint);
 
                     double AttrWeight = Manip.DistanceTo(p) + Goal.DistanceTo(p);
-                    AttrWeights.Add(AttrWeight);
 
                     Point[] AttrArea = new Point[180];
                     double r = 0.1 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
@@ -124,7 +118,7 @@ namespace RoboDraw
                         );
                     }
 
-                    Areas.Add(new Tuple<Point[], double>(AttrArea, r));
+                    Attractors.Add(new Attractor(AttrPoint, AttrWeight, AttrArea, r));
                 }
             }
 

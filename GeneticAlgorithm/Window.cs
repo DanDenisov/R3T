@@ -41,6 +41,7 @@ namespace RoboDraw
         private int Count = 0, MainCount = 0;
         
         private Thread Main;
+        private Attractor[] AttractorsLoc;
 
         public Window(int width, int height, string title) : base(width, height, GraphicsMode.Default, title) { }
 
@@ -126,15 +127,18 @@ namespace RoboDraw
 
             if (vbo_attr_p == 0)
             {
-                if (Manager.AttrPoints.Count != 0)
+                if (Manager.Attractors.Count != 0)
                 {
-                    Point[] points = new Point[Manager.AttrPoints.Count];
+                    Point[] points = new Point[Manager.Attractors.Count];
                     for (int i = 0; i < points.Length; i++)
                     {
-                        points[i] = Manager.AttrPoints[i];
+                        points[i] = Manager.Attractors[i].Center;
                     }
 
                     SetData(ref vbo_attr_p, ref vao_attr_p, GL_Convert(points, new Vector3(1, 0, 0)));
+
+                    AttractorsLoc = new Attractor[Manager.Attractors.Count];
+                    Manager.Attractors.CopyTo(AttractorsLoc);
                 }
             }
             else
@@ -143,23 +147,23 @@ namespace RoboDraw
                 DisplayData(vao_attr_p, model, () =>
                 {
                     GL.PointSize(5);
-                    GL.DrawArrays(PrimitiveType.Points, 0, Manager.AttrPoints.Count);
+                    GL.DrawArrays(PrimitiveType.Points, 0, AttractorsLoc.Length);
                     GL.PointSize(1);
                 });
             }
 
             if (vbo_attr_a == null)
             {
-                if (Manager.Areas.Count != 0)
+                if (Manager.Attractors.Count != 0)
                 {
-                    Point[][] areas = new Point[Manager.Areas.Count][];
+                    Point[][] areas = new Point[Manager.Attractors.Count][];
                     for (int i = 0; i < areas.Length; i++)
                     {
-                        areas[i] = Manager.Areas[i].Item1;
+                        areas[i] = Manager.Attractors[i].Area;
                     }
 
-                    vbo_attr_a = new int[Manager.Areas.Count];
-                    vao_attr_a = new int[Manager.Areas.Count];
+                    vbo_attr_a = new int[Manager.Attractors.Count];
+                    vao_attr_a = new int[Manager.Attractors.Count];
                     
                     for (int i = 0; i < areas.Length; i++)
                     {
@@ -174,7 +178,7 @@ namespace RoboDraw
                 {
                     DisplayData(vao_attr_a[i], model, () =>
                     {
-                        GL.DrawArrays(PrimitiveType.Points, 0, Manager.Areas[i].Item1.Length);
+                        GL.DrawArrays(PrimitiveType.Points, 0, AttractorsLoc[i].Area.Length);
                     });
                 }
             }

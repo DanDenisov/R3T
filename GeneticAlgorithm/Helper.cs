@@ -400,6 +400,24 @@ namespace Helper
         }
     }
 
+    public class Attractor
+    {
+        public Point Center;
+        public double Weight;
+        public Point[] Area;
+        public double Radius;
+        public double InliersCount;
+
+        public Attractor(Point center, double weight, Point[] area, double radius)
+        {
+            Center = center;
+            Weight = weight;
+            Area = area;
+            Radius = radius;
+            InliersCount = 0;
+        }
+    }
+
     public static class Misc
     {
         public static double[] ToRad(double[] degrees)

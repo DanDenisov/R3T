@@ -32,10 +32,10 @@ namespace PathGenerator
 
             for (int i = 0; i < k; i++)
             {
-                /*if ((i + 1) % 1000 == 0)
+                if ((i + 1) % 5000 == 0)
                 {
                     tree.RectifyWhole();
-                }*/
+                }
 
                 double work_radius;
                 double x;
@@ -75,15 +75,15 @@ namespace PathGenerator
                     weight = Manager.AttrWeights.Max();
                 int index = Manager.AttrWeights.IndexOf(weight);*/
 
-                int index = rng.Next(0, Manager.AttrPoints.Count);
+                int index = rng.Next(0, Manager.Attractors.Count);
 
-                work_radius = Manager.Areas[index].Item2;
+                work_radius = Manager.Attractors[index].Radius;
                 x = rng.NextDouble() * 2 * work_radius - work_radius;
                 y_plus = Math.Sqrt(work_radius * work_radius - x * x);
                 y_minus = -y_plus;
-                y = Manager.AttrPoints[index].y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
+                y = Manager.Attractors[index].Center.y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
 
-                Point p = new Point(x + Manager.AttrPoints[index].x, y);
+                Point p = new Point(x + Manager.Attractors[index].Center.x, y);
                 Tree.Node min_node = tree.Min(p);
 
                 Vector v = new Vector(min_node.p, p);
@@ -104,7 +104,16 @@ namespace PathGenerator
                     var res = Solver.Execute(p_n);
                     if (res.Item1 && !res.Item4.Contains(true))
                     {
-                        tree.AddNode(new Tree.Node(min_node, p_n, Algorithm.Agent.q.Zip(res.Item3, (t, s) => { return t + s; }).ToArray()));
+                        if (Manager.Attractors[index].InliersCount < 5)
+                        {
+                            tree.AddNode(new Tree.Node(min_node, p_n, Algorithm.Agent.q.Zip(res.Item3, (t, s) => { return t + s; }).ToArray()));
+                            if (p_n.DistanceTo(Manager.Attractors[index].Center) < Manager.Attractors[index].Radius)
+                                Manager.Attractors[index].InliersCount++;
+                        }
+                        else
+                        {
+                            Manager.Attractors.RemoveAt(index);
+                        }
                     }
                 }
             }
