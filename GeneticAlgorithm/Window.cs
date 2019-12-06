@@ -24,8 +24,8 @@ namespace RoboDraw
             0.0f, -10.0f, 0.0f, 1.0f, 1.0f, 1.0f,
         };
         
-        private int vbo_frameX, vbo_frameY, vbo_joints, vbo_path, vbo_goal;
-        private int vao_frameX, vao_frameY, vao_joints, vao_path, vao_goal;
+        private int vbo_frameX, vbo_frameY, vbo_joints, vbo_path, vbo_goal, vbo_nodes;
+        private int vao_frameX, vao_frameY, vao_joints, vao_path, vao_goal, vao_nodes;
         private int[] vbo_obst, vbo_bound, vbo_chs;
         private int[] vao_obst, vao_bound, vao_chs;
         private List<int> vbo_tree, vao_tree;
@@ -51,8 +51,8 @@ namespace RoboDraw
 
             GL.Enable(EnableCap.DepthTest);
 
-            _shader = new Shader(@"C:\Users\Dan\source\repos\GeneticAlgorithm\Shaders\VertexShader.txt",
-                @"C:\Users\Dan\source\repos\GeneticAlgorithm\Shaders\FragmentShader.txt");
+            _shader = new Shader(@"C:\Users\Dan\source\repos\R3T\Shaders\VertexShader.txt",
+                @"C:\Users\Dan\source\repos\R3T\Shaders\FragmentShader.txt");
             _shader.Use();
 
             // We initialize the camera so that it is 3 units back from where the rectangle is
@@ -124,6 +124,21 @@ namespace RoboDraw
             //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
             //}
 
+            if (vao_nodes == 0 && Manager.Nodes.Count > 0)
+            {
+                SetData(ref vbo_nodes, ref vao_nodes, GL_Convert(Manager.Nodes.ToArray(), new Vector3(1, 0, 0)));
+            }
+            else
+            {
+                model = Matrix4.Identity;
+                DisplayData(vao_nodes, model, () =>
+                {
+                    GL.PointSize(5);
+                    GL.DrawArrays(PrimitiveType.Points, 0, Manager.Nodes.Count);
+                    GL.PointSize(1);
+                });
+            }
+
             // goal
             if (vao_goal == 0)
             {
@@ -176,23 +191,7 @@ namespace RoboDraw
                     });
                 }
             }
-
-            // chromosomes
-            if (PathPlanner.Chs != null)
-            {
-                vbo_chs = new int[PathPlanner.Chs.Length];
-                vao_chs = new int[PathPlanner.Chs.Length];
-                for (int i = 0; i < vbo_chs.Length; i++)
-                {
-                    SetData(ref vbo_chs[i], ref vao_chs[i], GL_Convert(PathPlanner.Chs[i].Genes, new Vector3(1 - i / (2 * PathPlanner.Chs.Length), 0.0f, 0.0f)));
-
-                    model = Matrix4.Identity;
-                    DisplayData(vao_chs[i], model, () =>
-                    {
-                        GL.DrawArrays(PrimitiveType.LineStrip, 0, PathPlanner.ParamNum);
-                    });
-                }
-            }
+            
 
             // checking if the thread has aborted
             if (!Main.IsAlive)
