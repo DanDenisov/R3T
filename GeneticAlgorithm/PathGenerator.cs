@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Helper;
 using WorkEnv;
 using GeneticAlgorithm;
+using RoboDraw;
 
 namespace PathGenerator
 {
@@ -31,17 +32,17 @@ namespace PathGenerator
 
             for (int i = 0; i < k; i++)
             {
-                if ((i + 1) % 1000 == 0)
+                /*if ((i + 1) % 1000 == 0)
                 {
                     tree.RectifyWhole();
-                }
+                }*/
 
                 double work_radius;
                 double x;
                 double y_plus, y_minus;
                 double y;
 
-                bool GoalConvergence = false;
+                /*bool GoalConvergence = false;
                 if (!GoalConvergence)
                 {
                     work_radius = Agent.Links.Sum();
@@ -61,9 +62,28 @@ namespace PathGenerator
                     y = goal.y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
                     if ((i + 1) % 100 == 0)
                         GoalConvergence = false;
-                }
+                }*/
 
-                Point p = new Point(x, y);
+                /*double[] arr = new double[Manager.AttrWeights.Count];
+                Manager.AttrWeights.CopyTo(arr);
+                var AttrWeightsLoc = arr.ToList();
+                AttrWeightsLoc.Sort();
+                
+                double num = Misc.BoxMullerTransform(rng, Manager.AttrWeights.Min(), Manager.AttrWeights.Max() / 3);
+                double weight = Manager.AttrWeights.Find((t) => { return t > num; });
+                if (weight == 0)
+                    weight = Manager.AttrWeights.Max();
+                int index = Manager.AttrWeights.IndexOf(weight);*/
+
+                int index = rng.Next(0, Manager.AttrPoints.Count);
+
+                work_radius = Manager.Areas[index].Item2;
+                x = rng.NextDouble() * 2 * work_radius - work_radius;
+                y_plus = Math.Sqrt(work_radius * work_radius - x * x);
+                y_minus = -y_plus;
+                y = Manager.AttrPoints[index].y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
+
+                Point p = new Point(x + Manager.AttrPoints[index].x, y);
                 Tree.Node min_node = tree.Min(p);
 
                 Vector v = new Vector(min_node.p, p);
@@ -88,7 +108,7 @@ namespace PathGenerator
                     }
                 }
             }
-            
+
             return tree;
         }
     }

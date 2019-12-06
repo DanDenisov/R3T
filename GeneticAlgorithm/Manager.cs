@@ -17,7 +17,9 @@ namespace RoboDraw
         public static List<Point> Path;
         public static List<Point[]> Joints;
         public static Tree Tree;
-        public static List<Point> Nodes;
+        public static List<Point> AttrPoints;
+        public static List<double> AttrWeights;
+        public static List<Tuple<Point[], double>> Areas;
 
         public static Dictionary<string, bool> States;
 
@@ -78,11 +80,13 @@ namespace RoboDraw
 
             IKP Solver = new IKP(0.02, Manip.Links.Length, 10, 0.2, 50);
 
-            Generator.Solver = Solver;
-            Nodes = new List<Point>();
+            AttrPoints = new List<Point>();
+            AttrWeights = new List<double>();
+            Areas = new List<Tuple<Point[], double>>();
+
             Random rng = new Random();
             double work_radius, x, y_plus, y_minus, y;
-            while (Nodes.Count < 100)
+            while (AttrPoints.Count < 50)
             {
                 work_radius = Manip.Links.Sum();
                 x = Manip.Base.x + rng.NextDouble() * 2 * work_radius - work_radius;
@@ -103,12 +107,30 @@ namespace RoboDraw
 
                 if (!collision)
                 {
-                    Nodes.Add(p);
+                    Point AttrPoint = p;
+                    AttrPoints.Add(AttrPoint);
+
+                    double AttrWeight = Manip.DistanceTo(p) + Goal.DistanceTo(p);
+                    AttrWeights.Add(AttrWeight);
+
+                    Point[] AttrArea = new Point[180];
+                    double r = 0.1 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
+                    for (int i = 0; i < AttrArea.Length; i++)
+                    {
+                        AttrArea[i] = new Point
+                        (
+                            r * Math.Cos(i * Math.PI / (AttrArea.Length / 2)) + AttrPoint.x,
+                            r * Math.Sin(i * Math.PI / (AttrArea.Length / 2)) + AttrPoint.y
+                        );
+                    }
+
+                    Areas.Add(new Tuple<Point[], double>(AttrArea, r));
                 }
             }
 
-            /*Generator.Solver = Solver;
-            Tree = Generator.RRT(new Random(), Goal, Manip, Obstacles, 20000, 0.04);
+            Generator.Solver = Solver;
+            Tree = Generator.RRT(new Random(), Goal, Manip, Obstacles, 15000, 0.04);
+
             Tree.Node start = Tree.Min(Goal), node_curr = start;
             List<Point> path = new List<Point>();
             List<double[]> configs = new List<double[]>();
@@ -150,7 +172,7 @@ namespace RoboDraw
                 Manip.q = config;
                 Joints.Add(Manip.Joints);
             }
-            States["Joints"] = true;*/
+            States["Joints"] = true;
         }
     }
 }
