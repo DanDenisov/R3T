@@ -420,5 +420,17 @@ namespace Helper
             array.CopyTo(array_new, 0);
             return array_new;
         }
+
+        public static double BoxMullerTransform(Random rng, double mu, double sigma)
+        {
+            double phi = 0, r = 0;
+            while (phi == 0)
+                phi = rng.NextDouble();
+            while (r == 0)
+                r = rng.NextDouble();
+
+            double z = Math.Cos(Math.PI * phi) * Math.Sqrt(-2 * Math.Log(r));
+            return mu + sigma * z;
+        }
     }
 }

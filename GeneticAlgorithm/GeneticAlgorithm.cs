@@ -346,7 +346,7 @@ namespace GeneticAlgorithm
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            while (Time++ < 500)
+            while (Time++ < 300)
             {
                 Chromosome<double> ch = new Chromosome<double>(ParamNum);
                 for (int i = 0; i < ParamNum; i++)

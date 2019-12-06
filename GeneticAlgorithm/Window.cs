@@ -24,10 +24,10 @@ namespace RoboDraw
             0.0f, -10.0f, 0.0f, 1.0f, 1.0f, 1.0f,
         };
         
-        private int vbo_frameX, vbo_frameY, vbo_joints, vbo_path, vbo_goal;
-        private int vao_frameX, vao_frameY, vao_joints, vao_path, vao_goal;
-        private int[] vbo_obst, vbo_bound, vbo_chs;
-        private int[] vao_obst, vao_bound, vao_chs;
+        private int vbo_frameX, vbo_frameY, vbo_joints, vbo_path, vbo_goal, vbo_attr_p;
+        private int vao_frameX, vao_frameY, vao_joints, vao_path, vao_goal, vao_attr_p;
+        private int[] vbo_obst, vbo_bound, vbo_chs, vbo_attr_a;
+        private int[] vao_obst, vao_bound, vao_chs, vao_attr_a;
         private List<int> vbo_tree, vao_tree;
 
         private Shader _shader;
@@ -123,6 +123,61 @@ namespace RoboDraw
             //    _shader.SetMatrix4("model", model);
             //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
             //}
+
+            if (vbo_attr_p == 0)
+            {
+                if (Manager.AttrPoints.Count != 0)
+                {
+                    Point[] points = new Point[Manager.AttrPoints.Count];
+                    for (int i = 0; i < points.Length; i++)
+                    {
+                        points[i] = Manager.AttrPoints[i];
+                    }
+
+                    SetData(ref vbo_attr_p, ref vao_attr_p, GL_Convert(points, new Vector3(1, 0, 0)));
+                }
+            }
+            else
+            {
+                model = Matrix4.Identity;
+                DisplayData(vao_attr_p, model, () =>
+                {
+                    GL.PointSize(5);
+                    GL.DrawArrays(PrimitiveType.Points, 0, Manager.AttrPoints.Count);
+                    GL.PointSize(1);
+                });
+            }
+
+            if (vbo_attr_a == null)
+            {
+                if (Manager.Areas.Count != 0)
+                {
+                    Point[][] areas = new Point[Manager.Areas.Count][];
+                    for (int i = 0; i < areas.Length; i++)
+                    {
+                        areas[i] = Manager.Areas[i].Item1;
+                    }
+
+                    vbo_attr_a = new int[Manager.Areas.Count];
+                    vao_attr_a = new int[Manager.Areas.Count];
+                    
+                    for (int i = 0; i < areas.Length; i++)
+                    {
+                        SetData(ref vbo_attr_a[i], ref vao_attr_a[i], GL_Convert(areas[i], new Vector3(1, 0, 1)));
+                    }
+                }
+            }
+            else
+            {
+                model = Matrix4.Identity;
+                for (int i = 0; i < vao_attr_a.Length; i++)
+                {
+                    DisplayData(vao_attr_a[i], model, () =>
+                    {
+                        GL.DrawArrays(PrimitiveType.Points, 0, Manager.Areas[i].Item1.Length);
+                    });
+                }
+            }
 
             // goal
             if (vao_goal == 0)
