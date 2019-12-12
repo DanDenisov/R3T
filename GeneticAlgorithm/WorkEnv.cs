@@ -22,7 +22,8 @@ namespace WorkEnv
         {
             this.Base = Base;
             this.Links = Links;
-            this.q = q;
+            this.q = new double[q.Length];
+            Array.Copy(q, this.q, q.Length);
             this.StepRanges = StepRanges;
         }
 
@@ -30,7 +31,8 @@ namespace WorkEnv
         {
             Base = Source.Base;
             Links = Source.Links;
-            q = Source.q;
+            q = new double[Source.q.Length];
+            Array.Copy(Source.q, q, Source.q.Length);
             StepRanges = Source.StepRanges;
         }
 

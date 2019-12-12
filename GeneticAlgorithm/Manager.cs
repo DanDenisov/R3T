@@ -29,6 +29,7 @@ namespace RoboDraw
             States.Add("Path", false);
             States.Add("Joints", false);
             States.Add("Tree", false);
+            States.Add("Attractors", false);
 
             //manipulator
             Manip = new Manipulator
@@ -82,7 +83,7 @@ namespace RoboDraw
 
             Random rng = new Random();
             double work_radius, x, y_plus, y_minus, y;
-            while (Attractors.Count < 200)
+            while (Attractors.Count < 500)
             {
                 work_radius = Manip.Links.Sum();
                 x = Manip.Base.x + rng.NextDouble() * 2 * work_radius - work_radius;
@@ -108,7 +109,7 @@ namespace RoboDraw
                     double AttrWeight = Manip.DistanceTo(p) + Goal.DistanceTo(p);
 
                     Point[] AttrArea = new Point[180];
-                    double r = 0.1 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
+                    double r = 0.05 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
                     for (int i = 0; i < AttrArea.Length; i++)
                     {
                         AttrArea[i] = new Point
@@ -121,15 +122,23 @@ namespace RoboDraw
                     Attractors.Add(new Attractor(AttrPoint, AttrWeight, AttrArea, r));
                 }
             }
+            States["Attractors"] = true;
 
             Generator.Solver = Solver;
             Tree = Generator.RRT(new Random(), Goal, Manip, Obstacles, 15000, 0.04);
+            //Tree.RectifyWhole();
 
             Tree.Node start = Tree.Min(Goal), node_curr = start;
             List<Point> path = new List<Point>();
             List<double[]> configs = new List<double[]>();
             for (int i = start.Layer; i >= 0; i--)
             {
+                if (i == 0)
+                {
+                    int a;
+                    a = 2;
+                }
+
                 if (node_curr.Layer == i)
                 {
                     path.Add(node_curr.p);
@@ -159,11 +168,17 @@ namespace RoboDraw
             States["Path"] = true;
 
             Joints = new List<Point[]>();
-            foreach (var config in configs)
+            for (int i = 0; i < configs.Count; i++)
             {
-                if (config == null)
+                if (configs[i] == null)
                     break;
-                Manip.q = config;
+
+                if (i == 0)
+                {
+                    int a;
+                    a = 0;
+                }
+                Manip.q = configs[i];
                 Joints.Add(Manip.Joints);
             }
             States["Joints"] = true;

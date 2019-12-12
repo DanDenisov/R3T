@@ -127,7 +127,7 @@ namespace RoboDraw
 
             if (vbo_attr_p == 0)
             {
-                if (Manager.Attractors.Count != 0)
+                if (Manager.States["Attractors"])
                 {
                     Point[] points = new Point[Manager.Attractors.Count];
                     for (int i = 0; i < points.Length; i++)
@@ -135,7 +135,7 @@ namespace RoboDraw
                         points[i] = Manager.Attractors[i].Center;
                     }
 
-                    SetData(ref vbo_attr_p, ref vao_attr_p, GL_Convert(points, new Vector3(1, 0, 0)));
+                    SetData(ref vbo_attr_p, ref vao_attr_p, GL_Convert(points, Vector3.UnitX));
 
                     AttractorsLoc = new Attractor[Manager.Attractors.Count];
                     Manager.Attractors.CopyTo(AttractorsLoc);
@@ -154,7 +154,7 @@ namespace RoboDraw
 
             if (vbo_attr_a == null)
             {
-                if (Manager.Attractors.Count != 0)
+                if (Manager.States["Attractors"])
                 {
                     Point[][] areas = new Point[Manager.Attractors.Count][];
                     for (int i = 0; i < areas.Length; i++)

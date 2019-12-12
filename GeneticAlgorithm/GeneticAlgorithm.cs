@@ -330,10 +330,10 @@ namespace GeneticAlgorithm
             double range = 0;
             for (int i = 0; i < ParamNum; i++)
             {
-                range = -120 * Math.PI / 180 - Agent.q[i];
+                range = -180 * Math.PI / 180 - Agent.q[i];
                 Agent.StepRanges[i, 0] = range <= -1 ? -1 : range;
 
-                range = 120 * Math.PI / 180 - Agent.q[i];
+                range = 180 * Math.PI / 180 - Agent.q[i];
                 Agent.StepRanges[i, 1] = range >= 1 ? 1 : range;
             }
 
