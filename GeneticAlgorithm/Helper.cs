@@ -448,7 +448,7 @@ namespace Helper
             while (r == 0)
                 r = rng.NextDouble();
 
-            double z = Math.Cos(-Math.PI / 2 + Math.PI * phi) * Math.Sqrt(-2 * Math.Log(r));
+            double z = Math.Cos(Math.PI * phi) * Math.Sqrt(-2 * Math.Log(r));
             return mu + sigma * z;
         }
     }

@@ -28,7 +28,7 @@ namespace RoboDraw
         private int vao_frameX, vao_frameY, vao_joints, vao_path, vao_goal, vao_attr_p;
         private int[] vbo_obst, vbo_bound, vbo_chs, vbo_attr_a;
         private int[] vao_obst, vao_bound, vao_chs, vao_attr_a;
-        private List<int> vbo_tree, vao_tree;
+        private List<int> vbo_tree = new List<int>(), vao_tree = new List<int>();
 
         private Shader _shader;
         
@@ -235,7 +235,6 @@ namespace RoboDraw
                     });
                 }
             }
-            
 
             // checking if the thread has aborted
             if (!Main.IsAlive)
@@ -278,7 +277,7 @@ namespace RoboDraw
                 }
 
                 // random Tree
-                if (vao_tree == null)
+                /*if (vao_tree == null)
                 {
                     if (Manager.States["Tree"])
                     {
@@ -306,7 +305,29 @@ namespace RoboDraw
                             GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
                         });
                     }
+                }*/
+            }
+
+            //random tree
+            if (Manager.Buffer.Count != 0)
+            {
+                for (int i = 0; i < Manager.Buffer.Count; i++)
+                {
+                    int b = 0, a = 0;
+                    SetData(ref b, ref a, GL_Convert(new Point[] { Manager.Buffer[i].p, Manager.Buffer[i].Parent.p }, Vector3.Zero));
+                    vbo_tree.Add(b);
+                    vao_tree.Add(a);
                 }
+                Manager.Buffer.Clear();
+            }
+
+            model = Matrix4.Identity;
+            for (int i = 0; i < vao_tree.Count; i++)
+            {
+                DisplayData(vao_tree[i], model, () =>
+                {
+                    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+                });
             }
 
             SwapBuffers();

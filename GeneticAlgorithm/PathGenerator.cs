@@ -16,19 +16,12 @@ namespace PathGenerator
         public static Obstacle[] Obstacles;
         public static IKP Solver;
 
-        public static Tree RRT(Random rng, Point goal, Manipulator manip, Obstacle[] obstacles, int k, double d)
+        public static void RRT(Random rng, ref Tree holder, Point goal, Manipulator manip, Obstacle[] obstacles, int k, double d)
         {
             Agent = new Manipulator(manip);
             Obstacles = obstacles;
-            //for (int i = 0; i < Algorithm.Agent.StepRanges.GetLength(0); i++)
-            //{
-            //    for (int j = 0; j < Algorithm.Agent.StepRanges.GetLength(1); j++)
-            //    {
-            //        Algorithm.Agent.StepRanges[i, j] *= 2;
-            //    }
-            //}
 
-            Tree tree = new Tree(new Tree.Node(null, Agent.GripperPos, Agent.q));
+            holder = new Tree(new Tree.Node(null, Agent.GripperPos, Agent.q));
 
             Attractor[] arr = new Attractor[Manager.Attractors.Count];
             Manager.Attractors.CopyTo(arr);
@@ -47,33 +40,11 @@ namespace PathGenerator
                 double y_plus, y_minus;
                 double y;
 
-                /*bool GoalConvergence = false;
-                if (!GoalConvergence)
-                {
-                    work_radius = Agent.Links.Sum();
-                    x = Agent.Base.x + rng.NextDouble() * 2 * work_radius - work_radius;
-                    y_plus = Math.Sqrt(work_radius * work_radius - x * x);
-                    y_minus = -y_plus;
-                    y = Agent.Base.y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
-                    if ((i + 1) % 800 == 0)
-                        GoalConvergence = true;
-                }
-                else
-                {
-                    work_radius = 1;
-                    x = goal.x + rng.NextDouble() * 2 * work_radius - work_radius;
-                    y_plus = Math.Sqrt(work_radius * work_radius - x * x);
-                    y_minus = -y_plus;
-                    y = goal.y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
-                    if ((i + 1) % 100 == 0)
-                        GoalConvergence = false;
-                }*/
-
-                double num = Misc.BoxMullerTransform(rng, AttractorsLoc[0].Weight, AttractorsLoc[AttractorsLoc.Count / 2 - 1].Weight / 3);
+                double num = Misc.BoxMullerTransform(rng, AttractorsLoc[0].Weight, AttractorsLoc[AttractorsLoc.Count / 4 - 1].Weight / 3);
                 Attractor attr = AttractorsLoc.Find((t) => { return t.Weight > num; });
                 int index = 0;
                 if (attr == null)
-                    index = rng.Next(AttractorsLoc.Count / 2 - 1, AttractorsLoc.Count);
+                    index = rng.Next(AttractorsLoc.Count / 4 - 1, AttractorsLoc.Count);
                 else
                     index = AttractorsLoc.IndexOf(attr);
 
@@ -86,7 +57,7 @@ namespace PathGenerator
                 y = AttractorsLoc[index].Center.y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
 
                 Point p = new Point(x + AttractorsLoc[index].Center.x, y);
-                Tree.Node min_node = tree.Min(p);
+                Tree.Node min_node = holder.Min(p);
 
                 Vector v = new Vector(min_node.p, p);
                 Point p_n = min_node.p + v.Normalized * d;
@@ -108,9 +79,12 @@ namespace PathGenerator
                     {
                         if (AttractorsLoc[index].InliersCount < 5)
                         {
-                            tree.AddNode(new Tree.Node(min_node, p_n, Algorithm.Agent.q));
+                            Tree.Node node = new Tree.Node(min_node, p_n, Algorithm.Agent.q);
+                            holder.AddNode(node);
                             if (p_n.DistanceTo(AttractorsLoc[index].Center) < AttractorsLoc[index].Radius)
                                 AttractorsLoc[index].InliersCount++;
+
+                            Manager.Buffer.Add(node);
                         }
                         else
                         {
@@ -118,9 +92,10 @@ namespace PathGenerator
                         }
                     }
                 }
-            }
 
-            return tree;
+                if (AttractorsLoc[0].InliersCount != 0)
+                    break;
+            }
         }
     }
 }

@@ -18,6 +18,7 @@ namespace RoboDraw
         public static List<Point[]> Joints;
         public static Tree Tree;
         public static List<Attractor> Attractors;
+        public static List<Tree.Node> Buffer = new List<Tree.Node>();
 
         public static Dictionary<string, bool> States;
 
@@ -83,6 +84,26 @@ namespace RoboDraw
 
             Random rng = new Random();
             double work_radius, x, y_plus, y_minus, y;
+
+            //adding main attractor
+            Point AttrPoint = Goal;
+
+            double AttrWeight = Manip.DistanceTo(Goal);
+
+            Point[] AttrArea = new Point[180];
+            double r = 0.05 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
+            for (int i = 0; i < AttrArea.Length; i++)
+            {
+                AttrArea[i] = new Point
+                (
+                    r * Math.Cos(i * Math.PI / (AttrArea.Length / 2)) + AttrPoint.x,
+                    r * Math.Sin(i * Math.PI / (AttrArea.Length / 2)) + AttrPoint.y
+                );
+            }
+
+            Attractors.Add(new Attractor(AttrPoint, AttrWeight, AttrArea, r));
+
+            //adding ancillary attractors
             while (Attractors.Count < 500)
             {
                 work_radius = Manip.Links.Sum();
@@ -104,12 +125,12 @@ namespace RoboDraw
 
                 if (!collision)
                 {
-                    Point AttrPoint = p;
+                    AttrPoint = p;
 
-                    double AttrWeight = Manip.DistanceTo(p) + Goal.DistanceTo(p);
+                    AttrWeight = Manip.DistanceTo(p) + Goal.DistanceTo(p);
 
-                    Point[] AttrArea = new Point[180];
-                    double r = 0.05 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
+                    AttrArea = new Point[180];
+                    r = 0.05 * Math.Pow(AttrWeight / Manip.DistanceTo(Goal), 4);
                     for (int i = 0; i < AttrArea.Length; i++)
                     {
                         AttrArea[i] = new Point
@@ -125,7 +146,7 @@ namespace RoboDraw
             States["Attractors"] = true;
 
             Generator.Solver = Solver;
-            Tree = Generator.RRT(new Random(), Goal, Manip, Obstacles, 15000, 0.04);
+            Generator.RRT(new Random(), ref Tree, Goal, Manip, Obstacles, 15000, 0.04);
             //Tree.RectifyWhole();
 
             Tree.Node start = Tree.Min(Goal), node_curr = start;
