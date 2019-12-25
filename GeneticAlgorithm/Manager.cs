@@ -83,7 +83,7 @@ namespace RoboDraw
             Attractors = new List<Attractor>();
 
             Random rng = new Random();
-            double work_radius, x, y_plus, y_minus, y;
+            double work_radius = Manip.Links.Sum(), x, y_plus, y_minus, y;
 
             //adding main attractor
             Point AttrPoint = Goal;
@@ -104,13 +104,14 @@ namespace RoboDraw
             Attractors.Add(new Attractor(AttrPoint, AttrWeight, AttrArea, r));
 
             //adding ancillary attractors
-            while (Attractors.Count < 500)
+            while (Attractors.Count < 1000)
             {
-                work_radius = Manip.Links.Sum();
+                //work_radius = Manip.Links.Sum();
                 x = Manip.Base.x + rng.NextDouble() * 2 * work_radius - work_radius;
                 y_plus = Math.Sqrt(work_radius * work_radius - x * x);
                 y_minus = -y_plus;
                 y = Manip.Base.y + (rng.NextDouble() * 2 * (y_plus - y_minus) - (y_plus - y_minus)) / 2;
+                work_radius -= Manip.Links.Sum() / 2000;
 
                 Point p = new Point(x, y);
                 bool collision = false;
