@@ -40,11 +40,11 @@ namespace PathGenerator
                 double y_plus, y_minus;
                 double y;
 
-                double num = Misc.BoxMullerTransform(rng, AttractorsLoc[0].Weight, AttractorsLoc[AttractorsLoc.Count / 4 - 1].Weight / 3);
+                double num = Misc.BoxMullerTransform(rng, AttractorsLoc[0].Weight, AttractorsLoc[AttractorsLoc.Count / 2 - 1].Weight / 3);
                 Attractor attr = AttractorsLoc.Find((t) => { return t.Weight > num; });
                 int index = 0;
                 if (attr == null)
-                    index = rng.Next(AttractorsLoc.Count / 4 - 1, AttractorsLoc.Count);
+                    index = rng.Next(AttractorsLoc.Count / 2 - 1, AttractorsLoc.Count);
                 else
                     index = AttractorsLoc.IndexOf(attr);
 

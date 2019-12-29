@@ -36,7 +36,7 @@ namespace RoboDraw
             Manip = new Manipulator
             {
                 Links = new double[] { 2, 2, 2, 2 },
-                q = Misc.ToRad(new double[] { 45, 15, 15, 15 }),
+                q = Misc.ToRad(new double[] { 0, 0, 0, 0 }),
                 Base = Point.Zero
             };
 
@@ -56,7 +56,7 @@ namespace RoboDraw
                 obst_data[i] = new Point
                 (
                     Math.Cos(i * Math.PI / 180) + 0,
-                    Math.Sin(i * Math.PI / 180) + 3.5
+                    Math.Sin(i * Math.PI / 180) + 1.5
                 );
             }
             Obstacles[0] = new Obstacle(obst_data);

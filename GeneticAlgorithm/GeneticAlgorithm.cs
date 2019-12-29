@@ -331,10 +331,10 @@ namespace GeneticAlgorithm
             for (int i = 0; i < ParamNum; i++)
             {
                 range = -120 * Math.PI / 180 - Agent.q[i];
-                Agent.StepRanges[i, 0] = range <= -1 ? -1 : range;
+                Agent.StepRanges[i, 0] = range / 5;  // <= -1 ? -1 : range;
 
                 range = 120 * Math.PI / 180 - Agent.q[i];
-                Agent.StepRanges[i, 1] = range >= 1 ? 1 : range;
+                Agent.StepRanges[i, 1] = range / 5;  // >= 1 ? 1 : range;
             }
 
             Manipulator Contestant = new Manipulator(Agent);
@@ -346,7 +346,7 @@ namespace GeneticAlgorithm
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            while (Time++ < 300)
+            while (Time++ < 1000)
             {
                 Chromosome<double> ch = new Chromosome<double>(ParamNum);
                 for (int i = 0; i < ParamNum; i++)
@@ -365,7 +365,7 @@ namespace GeneticAlgorithm
                     coeff = dist / init_dist;
                 }
 
-                if (dist < 0.0002)
+                if (dist < 0.002)
                 {
                     Converged = true;
                     break;

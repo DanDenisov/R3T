@@ -93,38 +93,6 @@ namespace RoboDraw
 
             Matrix4 model;
 
-            // lines on the X axis
-            GL.BindVertexArray(vao_frameX);
-            model = Matrix4.Identity;
-            _shader.SetMatrix4("model", model);
-            GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
-            //for (int i = 1; i < 5; i++)
-            //{
-            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitZ * i);
-            //    _shader.SetMatrix4("model", model);
-            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
-
-            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitZ * -i);
-            //    _shader.SetMatrix4("model", model);
-            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
-            //}
-
-            // lines on the Y axis
-            GL.BindVertexArray(vao_frameY);
-            model = Matrix4.Identity;
-            _shader.SetMatrix4("model", model);
-            GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
-            //for (int i = 1; i < 5; i++)
-            //{
-            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitX * i);
-            //    _shader.SetMatrix4("model", model);
-            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
-
-            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitX * -i);
-            //    _shader.SetMatrix4("model", model);
-            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
-            //}
-
             if (vbo_attr_p == 0)
             {
                 if (Manager.States["Attractors"])
@@ -181,23 +149,6 @@ namespace RoboDraw
                         GL.DrawArrays(PrimitiveType.Points, 0, AttractorsLoc[i].Area.Length);
                     });
                 }
-            }
-
-            // goal
-            if (vao_goal == 0)
-            {
-                if (Manager.States["Goal"])
-                    SetData(ref vbo_goal, ref vao_goal, GL_Convert(new Point[] { Manager.Goal }, new Vector3(1, 1, 0)));
-            }
-            else
-            {
-                model = Matrix4.Identity;
-                DisplayData(vao_goal, model, () =>
-                {
-                    GL.PointSize(5);
-                    GL.DrawArrays(PrimitiveType.Points, 0, 1);
-                    GL.PointSize(1);
-                });
             }
 
             // obstacles + boundings
@@ -329,6 +280,55 @@ namespace RoboDraw
                     GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
                 });
             }
+
+            // goal
+            if (vao_goal == 0)
+            {
+                if (Manager.States["Goal"])
+                    SetData(ref vbo_goal, ref vao_goal, GL_Convert(new Point[] { Manager.Goal }, new Vector3(1, 1, 0)));
+            }
+            else
+            {
+                model = Matrix4.Identity;
+                DisplayData(vao_goal, model, () =>
+                {
+                    GL.PointSize(5);
+                    GL.DrawArrays(PrimitiveType.Points, 0, 1);
+                    GL.PointSize(1);
+                });
+            }
+
+            // lines on the X axis
+            GL.BindVertexArray(vao_frameX);
+            model = Matrix4.Identity;
+            _shader.SetMatrix4("model", model);
+            GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+            //for (int i = 1; i < 5; i++)
+            //{
+            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitZ * i);
+            //    _shader.SetMatrix4("model", model);
+            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+
+            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitZ * -i);
+            //    _shader.SetMatrix4("model", model);
+            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+            //}
+
+            // lines on the Y axis
+            GL.BindVertexArray(vao_frameY);
+            model = Matrix4.Identity;
+            _shader.SetMatrix4("model", model);
+            GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+            //for (int i = 1; i < 5; i++)
+            //{
+            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitX * i);
+            //    _shader.SetMatrix4("model", model);
+            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+
+            //    model = Matrix4.Identity * Matrix4.CreateTranslation(Vector3.UnitX * -i);
+            //    _shader.SetMatrix4("model", model);
+            //    GL.DrawArrays(PrimitiveType.LineStrip, 0, 2);
+            //}
 
             SwapBuffers();
 
